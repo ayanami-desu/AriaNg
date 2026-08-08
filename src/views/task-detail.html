@@ -32,14 +32,6 @@
                                   ng-tooltip="{{(task.bittorrent && task.bittorrent.comment) ? task.bittorrent.comment : task.taskName}}"></span>
                         </div>
                     </div>
-                    <div class="row" ng-if="task && fileNames.length">
-                        <div class="setting-key col-sm-4">
-                            <span translate>File Name</span>
-                        </div>
-                        <div class="setting-value col-sm-8">
-                            <span class="allow-word-break" ng-bind="fileNames.join(', ')"></span>
-                        </div>
-                    </div>
                     <div class="row" ng-if="task">
                         <div class="setting-key col-sm-4">
                             <span translate>Task Size</span>
@@ -133,7 +125,7 @@
                             <span class="allow-word-break" ng-bind="task.infoHash"></span>
                         </div>
                     </div>
-                    <div class="row" ng-if="task && magnetUri">
+                    <div class="row gateway-magnet-row" ng-if="task && magnetUri">
                         <div class="setting-key col-sm-4">
                             <span translate>Magnet Link</span>
                         </div>

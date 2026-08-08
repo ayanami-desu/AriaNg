@@ -43,6 +43,13 @@
 
             return status || 'Unknown';
         };
+        $scope.getTaskName = function (task) {
+            if (!task) {
+                return '';
+            }
+
+            return task.task_name || task.name || task.taskName || '';
+        };
 
         $scope.isMagnetTask = function (task) {
             return !!(task && task.urls && task.urls.length && task.urls[0].toLowerCase().indexOf('magnet:?') === 0);
