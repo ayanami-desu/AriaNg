@@ -3,7 +3,7 @@ name: Publish AriaNg image
 on:
   push:
     branches:
-      - master
+      - develop
     tags:
       - 'v*'
   workflow_dispatch:
@@ -38,7 +38,8 @@ jobs:
             type=ref,event=branch
             type=ref,event=tag
             type=sha,prefix=sha-,format=short
-            type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=master,enable=${{ github.ref == format('refs/heads/{0}', 'develop') }}
+            type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', 'develop') }}
 
       - name: Build and push image
         uses: docker/build-push-action@v6
