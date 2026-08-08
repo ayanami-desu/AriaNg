@@ -74,8 +74,8 @@
                             <td class="gateway-task-primary" data-label="{{'Task ID' | translate}}">
                                 <div class="gateway-task-primary-content">
                                     <div class="gateway-task-id" ng-bind="task.id"></div>
-                                    <div class="gateway-task-file-name" ng-if="task.file_names && task.file_names.length">
-                                        <i class="fa fa-file-o"></i> <span ng-bind="task.file_names.join(', ')"></span>
+                                    <div class="gateway-task-name" ng-if="getTaskName(task)">
+                                        <i class="fa fa-tag"></i> <span ng-bind="getTaskName(task)" title="{{getTaskName(task)}}"></span>
                                     </div>
                                     <div class="gateway-task-url text-muted" ng-if="task.urls && task.urls.length" ng-bind="task.urls[0]" title="{{task.urls[0]}}"></div>
                                     <button type="button" class="btn btn-xs btn-default gateway-task-magnet-copy" ng-if="isMagnetTask(task)" ng-click="copyMagnet(task)" title="{{'Copy Magnet Link' | translate}}">

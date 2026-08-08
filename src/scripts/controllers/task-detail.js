@@ -38,18 +38,6 @@
         };
 
         var updateGatewayDetails = function (task) {
-            var fileNames = [];
-            var seenFileNames = {};
-            if (task.files) {
-                for (var i = 0; i < task.files.length; i++) {
-                    var file = task.files[i];
-                    if (!file.isDir && file.fileName && !seenFileNames[file.fileName]) {
-                        seenFileNames[file.fileName] = true;
-                        fileNames.push(file.fileName);
-                    }
-                }
-            }
-            $scope.fileNames = fileNames;
 
             var directMagnetUri = magnetUriFromUrls(task.singleUrl ? [task.singleUrl] : []);
             if (directMagnetUri) {
@@ -65,9 +53,6 @@
             transferGatewayService.getTaskByGid(task.gid).then(function (gatewayTask) {
                 if (gatewayTaskGID === task.gid) {
                     $scope.magnetUri = magnetUriFromUrls(gatewayTask.urls);
-                    if ((!$scope.fileNames || !$scope.fileNames.length) && gatewayTask.file_names) {
-                        $scope.fileNames = gatewayTask.file_names;
-                    }
                 }
             }, angular.noop);
         };
