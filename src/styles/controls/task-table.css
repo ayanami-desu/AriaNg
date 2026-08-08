@@ -16,6 +16,11 @@
     padding-top: 4px;
     padding-bottom: 4px;
 }
+.task-table .task-table-toolbar {
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+
 
 .task-table .task-table-title a {
     color: #000;

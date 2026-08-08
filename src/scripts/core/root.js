@@ -183,6 +183,7 @@
             },
             isAllSelected: function () {
                 var isAllSelected = true;
+                var hasVisibleTask = false;
 
                 for (var i = 0; i < this.list.length; i++) {
                     var task = this.list[i];
@@ -191,13 +192,14 @@
                         continue;
                     }
 
+                    hasVisibleTask = true;
                     if (!this.selected[task.gid]) {
                         isAllSelected = false;
                         break;
                     }
                 }
 
-                return isAllSelected;
+                return hasVisibleTask && isAllSelected;
             },
             hasRetryableTask: function () {
                 for (var i = 0; i < this.list.length; i++) {

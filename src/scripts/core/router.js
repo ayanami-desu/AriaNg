@@ -15,6 +15,14 @@
                 templateUrl: 'views/list.html',
                 controller: 'DownloadListController'
             })
+            .when('/gateway/tasks', {
+                templateUrl: 'views/transfer-gateway-tasks.html',
+                controller: 'TransferGatewayTaskController'
+            })
+            .when('/gateway/destinations', {
+                templateUrl: 'views/gateway-destinations.html',
+                controller: 'GatewayDestinationController'
+            })
             .when('/new', {
                 templateUrl: 'views/new.html',
                 controller: 'NewTaskController'

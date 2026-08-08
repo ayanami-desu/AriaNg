@@ -73,6 +73,7 @@
             availableTime: ariaNgCommonService.getTimeOptions([1000, 2000, 3000, 5000, 10000, 30000, 60000], true),
             trueFalseOptions: [{name: 'Enabled', value: true}, {name: 'Disabled', value: false}],
             showRpcSecret: false,
+            showTransferGatewayToken: false,
             isInsecureProtocolDisabled: ariaNgSettingService.isInsecureProtocolDisabled(),
             settings: ariaNgSettingService.getAllOptions(),
             sessionSettings: ariaNgSettingService.getAllSessionOptions(),
@@ -167,6 +168,10 @@
         $scope.setTheme = function (value) {
             ariaNgSettingService.setTheme(value);
             $rootScope.setTheme(value);
+        };
+
+        $scope.setTransferGatewayToken = function (value) {
+            ariaNgSettingService.setTransferGatewayToken(value);
         };
 
         $scope.setDebugMode = function (value) {

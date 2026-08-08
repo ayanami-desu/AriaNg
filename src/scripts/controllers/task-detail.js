@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    angular.module('ariaNg').controller('TaskDetailController', ['$rootScope', '$scope', '$routeParams', '$interval', 'clipboard', 'aria2RpcErrors', 'ariaNgFileTypes', 'ariaNgCommonService', 'ariaNgSettingService', 'ariaNgMonitorService', 'aria2TaskService', 'aria2SettingService', function ($rootScope, $scope, $routeParams, $interval, clipboard, aria2RpcErrors, ariaNgFileTypes, ariaNgCommonService, ariaNgSettingService, ariaNgMonitorService, aria2TaskService, aria2SettingService) {
+    angular.module('ariaNg').controller('TaskDetailController', ['$rootScope', '$scope', '$routeParams', '$interval', 'clipboard', 'aria2RpcErrors', 'ariaNgFileTypes', 'ariaNgCommonService', 'ariaNgSettingService', 'ariaNgMonitorService', 'aria2TaskService', 'aria2SettingService', 'transferGatewayService', function ($rootScope, $scope, $routeParams, $interval, clipboard, aria2RpcErrors, ariaNgFileTypes, ariaNgCommonService, ariaNgSettingService, ariaNgMonitorService, aria2TaskService, aria2SettingService, transferGatewayService) {
         var tabStatusItems = [
             {
                 name: 'overview',
@@ -23,6 +23,75 @@
         var downloadTaskRefreshPromise = null;
         var pauseDownloadTaskRefresh = false;
         var currentRowTriggeredMenu = null;
+        var gatewayTaskGID = '';
+
+        var magnetUriFromUrls = function (urls) {
+            if (!urls) {
+                return '';
+            }
+            for (var i = 0; i < urls.length; i++) {
+                if (urls[i] && urls[i].toLowerCase().indexOf('magnet:?') === 0) {
+                    return urls[i];
+                }
+            }
+            return '';
+        };
+
+        var updateGatewayDetails = function (task) {
+            var fileNames = [];
+            var seenFileNames = {};
+            if (task.files) {
+                for (var i = 0; i < task.files.length; i++) {
+                    var file = task.files[i];
+                    if (!file.isDir && file.fileName && !seenFileNames[file.fileName]) {
+                        seenFileNames[file.fileName] = true;
+                        fileNames.push(file.fileName);
+                    }
+                }
+            }
+            $scope.fileNames = fileNames;
+
+            var directMagnetUri = magnetUriFromUrls(task.singleUrl ? [task.singleUrl] : []);
+            if (directMagnetUri) {
+                $scope.magnetUri = directMagnetUri;
+                gatewayTaskGID = task.gid;
+                return;
+            }
+            if (!task.gid || gatewayTaskGID === task.gid) {
+                return;
+            }
+            gatewayTaskGID = task.gid;
+            $scope.magnetUri = '';
+            transferGatewayService.getTaskByGid(task.gid).then(function (gatewayTask) {
+                if (gatewayTaskGID === task.gid) {
+                    $scope.magnetUri = magnetUriFromUrls(gatewayTask.urls);
+                    if ((!$scope.fileNames || !$scope.fileNames.length) && gatewayTask.file_names) {
+                        $scope.fileNames = gatewayTask.file_names;
+                    }
+                }
+            }, angular.noop);
+        };
+
+        var getVisibleTabOrders = function () {
+            var items = [];
+
+            for (var i = 0; i < tabStatusItems.length; i++) {
+                if (tabStatusItems[i].show) {
+                    items.push(tabStatusItems[i].name);
+                }
+            }
+
+            return items;
+        };
+
+        var setTabItemShow = function (name, status) {
+            for (var i = 0; i < tabStatusItems.length; i++) {
+                if (tabStatusItems[i].name === name) {
+                    tabStatusItems[i].show = status;
+                    break;
+                }
+            }
+        };
 
         var getVisibleTabOrders = function () {
             var items = [];
@@ -91,6 +160,7 @@
             }
 
             $scope.task = ariaNgCommonService.copyObjectTo(task, $scope.task);
+            updateGatewayDetails($scope.task);
 
             $rootScope.taskContext.list = [$scope.task];
             $rootScope.taskContext.selected = {};
@@ -399,6 +469,17 @@
             }
 
             updateAllDirNodesSelectedStatus();
+        };
+        $scope.selectAllFiles = function () {
+            if (!$scope.task || !$scope.task.files) {
+                return;
+            }
+
+            if (!$scope.context.showChooseFilesToolbar) {
+                $scope.showChooseFilesToolbar();
+            }
+
+            $scope.selectFiles('auto');
         };
 
         $scope.chooseSpecifiedFiles = function (type) {
@@ -712,6 +793,12 @@
             } else {
                 clipboard.copyText(value);
             };
+        };
+
+        $scope.copyMagnetUri = function () {
+            if ($scope.magnetUri) {
+                clipboard.copyText($scope.magnetUri);
+            }
         };
 
         if (ariaNgSettingService.getDownloadTaskRefreshInterval() > 0) {

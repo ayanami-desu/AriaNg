@@ -187,6 +187,7 @@ POST method only supports aria2 v1.15.2 and above.=El método POST solo es compa
 Aria2 RPC Request Headers=Encabezados de solicitud RPC de Aria2
 Support multiple request headers, one header per line, each line containing "header name: header value".=Admite múltiples encabezados de solicitud, un encabezado por línea, cada línea conteniendo "nombre del encabezado: valor del encabezado".
 Aria2 RPC Secret Token=Token secreto RPC de Aria2
+Transfer Gateway Token=Token de la puerta de enlace de transferencia
 Activate=Activar
 Reset Settings=Restablecer configuración
 Confirm Reset=Confirmar Restablecer

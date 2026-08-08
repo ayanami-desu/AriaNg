@@ -39,6 +39,8 @@
     <link rel="stylesheet" href="styles/controls/task-table.css"/>
     <link rel="stylesheet" href="styles/controls/settings-table.css"/>
     <link rel="stylesheet" href="styles/controls/new-task-table.css"/>
+    <link rel="stylesheet" href="styles/controls/transfer-gateway-task-table.css"/>
+    <link rel="stylesheet" href="styles/controls/gateway-destinations.css"/>
     <link rel="stylesheet" href="styles/controls/piece-bar-map.css"/>
     <link rel="stylesheet" href="styles/controls/chart.css"/>
     <link rel="stylesheet" href="styles/controls/angular-promise-buttons.css"/>
@@ -199,6 +201,13 @@
                 <li data-href-match="/stopped">
                     <a href="#!/stopped"><i class="fa fa-check-circle-o"></i> <span ng-bind="('Finished / Stopped' | translate) + (globalStat && globalStat.numStopped > 0 ? ' (' + globalStat.numStopped + ')' : '')">Finished / Stopped</span></a>
                 </li>
+                <li class="header" translate>Transfer Gateway</li>
+                <li data-href-match="/gateway/tasks">
+                    <a href="#!/gateway/tasks"><i class="fa fa-tasks"></i> <span translate>Task Management</span></a>
+                </li>
+                <li data-href-match="/gateway/destinations">
+                    <a href="#!/gateway/destinations"><i class="fa fa-cloud-upload"></i> <span translate>Destination Management</span></a>
+                </li>
                 <li class="header" translate>Settings</li>
                 <li data-href-match="/settings/ariang">
                     <a href="#!/settings/ariang"><i class="fa fa-cog"></i> <span translate>AriaNg Settings</span></a>
@@ -347,6 +356,7 @@
 <script src="../node_modules/angularjs-dragula/dist/angularjs-dragula.min.js"></script>
 <script src="../node_modules/angular-sweetalert/SweetAlert.js"></script>
 <!-- endbuild -->
+<script src="config.js"></script>
 <!-- build:js js/aria-ng.min.js -->
 <script src="scripts/core/__core.js"></script>
 <script src="scripts/core/__fix.js"></script>
@@ -368,6 +378,8 @@
 <script src="scripts/controllers/main.js"></script>
 <script src="scripts/controllers/new.js"></script>
 <script src="scripts/controllers/list.js"></script>
+<script src="scripts/controllers/transfer-gateway-tasks.js"></script>
+<script src="scripts/controllers/gateway-destinations.js"></script>
 <script src="scripts/controllers/task-detail.js"></script>
 <script src="scripts/controllers/settings-ariang.js"></script>
 <script src="scripts/controllers/settings-aria2.js"></script>
@@ -405,6 +417,7 @@
 <script src="scripts/services/ariaNgStorageService.js"></script>
 <script src="scripts/services/ariaNgFileService.js"></script>
 <script src="scripts/services/ariaNgSettingService.js"></script>
+<script src="scripts/services/transferGatewayService.js"></script>
 <script src="scripts/services/ariaNgMonitorService.js"></script>
 <script src="scripts/services/ariaNgTitleService.js"></script>
 <script src="scripts/services/ariaNgVersionService.js"></script>
