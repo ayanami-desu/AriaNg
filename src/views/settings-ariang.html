@@ -50,6 +50,22 @@
                             </select>
                         </div>
                     </div>
+                    <div class="row">
+                        <div class="setting-key setting-key-without-desc col-sm-4">
+                            <span translate>Transfer Gateway Token</span>
+                        </div>
+                        <div class="setting-value col-sm-8">
+                            <div class="input-group">
+                                <input class="form-control" type="{{context.showTransferGatewayToken ? 'text' : 'password'}}" ng-model="context.settings.transferGatewayToken" ng-change="setTransferGatewayToken(context.settings.transferGatewayToken)"/>
+                                <span class="input-group-addon input-group-addon-compact no-vertical-padding">
+                                    <button class="btn btn-xs btn-default" title="{{context.showTransferGatewayToken ? 'Hide Secret' : 'Show Secret' | translate}}"
+                                            ng-class="{'active': context.showTransferGatewayToken}" ng-click="context.showTransferGatewayToken = !context.showTransferGatewayToken">
+                                        <i class="fa fa-eye"></i>
+                                    </button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
                     <div class="row" ng-if="context.showDebugMode">
                         <div class="setting-key setting-key-without-desc col-sm-4">
                             <span translate>Debug Mode</span>

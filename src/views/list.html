@@ -1,5 +1,14 @@
 <section class="content no-padding">
     <div id="task-table" class="task-table">
+        <div class="task-table-toolbar" ng-if="taskContext.enableSelectAll && taskContext.list && taskContext.list.length > 0">
+            <button type="button" class="btn btn-default btn-sm" ng-click="selectAllTasks()"
+                    ng-attr-title="{{(isAllTasksSelected() ? 'Select None' : 'Select All') | translate}}"
+                    ng-attr-aria-label="{{(isAllTasksSelected() ? 'Select None' : 'Select All') | translate}}">
+                <i class="fa fa-check-square-o" aria-hidden="true"></i>
+                <span ng-if="!isAllTasksSelected()" translate>Select All</span>
+                <span ng-if="isAllTasksSelected()" translate>Select None</span>
+            </button>
+        </div>
         <div class="task-table-title">
             <div class="row">
                 <div class="col-md-8 col-sm-7">

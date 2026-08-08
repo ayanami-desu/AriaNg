@@ -32,6 +32,14 @@
                                   ng-tooltip="{{(task.bittorrent && task.bittorrent.comment) ? task.bittorrent.comment : task.taskName}}"></span>
                         </div>
                     </div>
+                    <div class="row" ng-if="task && fileNames.length">
+                        <div class="setting-key col-sm-4">
+                            <span translate>File Name</span>
+                        </div>
+                        <div class="setting-value col-sm-8">
+                            <span class="allow-word-break" ng-bind="fileNames.join(', ')"></span>
+                        </div>
+                    </div>
                     <div class="row" ng-if="task">
                         <div class="setting-key col-sm-4">
                             <span translate>Task Size</span>
@@ -125,6 +133,17 @@
                             <span class="allow-word-break" ng-bind="task.infoHash"></span>
                         </div>
                     </div>
+                    <div class="row" ng-if="task && magnetUri">
+                        <div class="setting-key col-sm-4">
+                            <span translate>Magnet Link</span>
+                        </div>
+                        <div class="setting-value col-sm-8 gateway-magnet-value">
+                            <span class="allow-word-break" ng-bind="magnetUri"></span>
+                            <button type="button" class="btn btn-default btn-xs" ng-click="copyMagnetUri()" title="{{'Copy Magnet Link' | translate}}">
+                                <i class="fa fa-copy"></i> <span translate>Copy Magnet Link</span>
+                            </button>
+                        </div>
+                    </div>
                     <div class="row" ng-if="task && task.singleUrl">
                         <div class="setting-key col-sm-4">
                             <span translate>Download Url</span>
@@ -179,6 +198,15 @@
             </div>
             <div class="tab-pane" ng-class="{'active': context.currentTab === 'filelist'}">
                 <div class="task-table">
+                    <div class="task-table-toolbar" ng-if="task && task.files && task.files.length > 1 && (task.status === 'waiting' || task.status === 'paused') && !context.showChooseFilesToolbar">
+                        <button type="button" class="btn btn-primary btn-sm" ng-click="selectAllFiles()"
+                                ng-attr-title="{{(isAllFileSelected() ? 'Select None' : 'Select All') | translate}}"
+                                ng-attr-aria-label="{{(isAllFileSelected() ? 'Select None' : 'Select All') | translate}}">
+                            <i class="fa fa-check-square-o" aria-hidden="true"></i>
+                            <span ng-if="!isAllFileSelected()" translate>Select All</span>
+                            <span ng-if="isAllFileSelected()" translate>Select None</span>
+                        </button>
+                    </div>
                     <div class="task-table-title">
                         <div class="row">
                             <div class="col-sm-8">
@@ -199,7 +227,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="task-table-title" ng-if="context.showChooseFilesToolbar">
+                    <div class="task-table-toolbar" ng-if="context.showChooseFilesToolbar">
                         <div class="row">
                             <div class="col-sm-12">
                                 <div class="btn-group">

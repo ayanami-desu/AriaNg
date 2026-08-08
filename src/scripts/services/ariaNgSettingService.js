@@ -142,7 +142,6 @@
 
             return ariaNgConstants.defaultHost;
         };
-
         var setOptions = function (options) {
             return ariaNgStorageService.set(ariaNgConstants.optionStorageKey, options);
         };
@@ -246,6 +245,10 @@
 
                 if (options.secret) {
                     options.secret = ariaNgCommonService.base64Decode(options.secret);
+                }
+
+                if (options.transferGatewayToken) {
+                    options.transferGatewayToken = ariaNgCommonService.base64Decode(options.transferGatewayToken);
                 }
 
                 if (angular.isArray(options.extendRpcServers)) {
@@ -506,6 +509,14 @@
             getCurrentRpcSecret: function () {
                 var value = getOption('secret');
                 return (value ? ariaNgCommonService.base64Decode(value) : value);
+            },
+            getTransferGatewayToken: function () {
+                var value = getOption('transferGatewayToken');
+                return (value ? ariaNgCommonService.base64Decode(value) : value);
+            },
+            setTransferGatewayToken: function (value) {
+                value = value || '';
+                setOption('transferGatewayToken', value ? ariaNgCommonService.base64Encode(value) : value);
             },
             addNewRpcSetting: function () {
                 var options = getOptions();

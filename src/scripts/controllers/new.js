@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    angular.module('ariaNg').controller('NewTaskController', ['$rootScope', '$scope', '$location', '$timeout', 'ariaNgCommonService', 'ariaNgLogService', 'ariaNgKeyboardService', 'ariaNgFileService', 'ariaNgSettingService', 'aria2TaskService', 'aria2SettingService', function ($rootScope, $scope, $location, $timeout, ariaNgCommonService, ariaNgLogService, ariaNgKeyboardService, ariaNgFileService, ariaNgSettingService, aria2TaskService, aria2SettingService) {
+    angular.module('ariaNg').controller('NewTaskController', ['$rootScope', '$scope', '$location', '$timeout', 'ariaNgCommonService', 'ariaNgLogService', 'ariaNgKeyboardService', 'ariaNgFileService', 'ariaNgSettingService', 'aria2TaskService', 'aria2SettingService', 'transferGatewayService', function ($rootScope, $scope, $location, $timeout, ariaNgCommonService, ariaNgLogService, ariaNgKeyboardService, ariaNgFileService, ariaNgSettingService, aria2TaskService, aria2SettingService, transferGatewayService) {
         var tabStatusItems = [
             {
                 name: 'links',
@@ -43,6 +43,33 @@
             aria2SettingService.addSettingHistory('dir', options.dir);
         };
 
+        var gatewayRequestFailed = function (error) {
+            var message = 'Transfer gateway request failed';
+            if (error && error.data && error.data.error) {
+                message = error.data.error;
+            }
+            ariaNgCommonService.showError(message);
+            return error;
+        };
+
+        var loadTransferDestinations = function () {
+            if (!$scope.context.gatewayEnabled) {
+                return;
+            }
+
+            $scope.context.destinationLoading = true;
+            transferGatewayService.getDestinations().then(function (destinations) {
+                $scope.context.destinations = destinations || [];
+                $scope.context.destinationLoading = false;
+                if (!$scope.context.destinationId && $scope.context.destinations.length > 0) {
+                    $scope.context.destinationId = $scope.context.destinations[0].id;
+                }
+            }, function (error) {
+                $scope.context.destinationLoading = false;
+                $scope.context.destinationError = 'Unable to load transfer destinations';
+                gatewayRequestFailed(error);
+            });
+        };
         var getDownloadTasksByLinks = function (options) {
             var urls = ariaNgCommonService.parseUrlsFromOriginInput($scope.context.urls);
             var tasks = [];
@@ -71,31 +98,55 @@
 
             saveDownloadPath(options);
 
+            if ($scope.context.gatewayEnabled) {
+                return transferGatewayService.createUriTasks(
+                    tasks,
+                    pauseOnAdded,
+                    $scope.context.destinationId,
+                    $scope.context.targetPath
+                ).then(responseCallback, gatewayRequestFailed);
+            }
             return aria2TaskService.newUriTasks(tasks, pauseOnAdded, responseCallback);
         };
 
         var downloadByTorrent = function (pauseOnAdded, responseCallback) {
             var options = angular.copy($scope.context.options);
+            var content = $scope.context.uploadFile.base64Content;
 
-            var task = {
-                content: $scope.context.uploadFile.base64Content,
-                options: options
-            };
+            saveDownloadPath(options);
 
-            saveDownloadPath(task.options);
+            if ($scope.context.gatewayEnabled) {
+                return transferGatewayService.createContentTask(
+                    'torrent',
+                    content,
+                    options,
+                    pauseOnAdded,
+                    $scope.context.destinationId,
+                    $scope.context.targetPath
+                ).then(responseCallback, gatewayRequestFailed);
+            }
 
-            return aria2TaskService.newTorrentTask(task, pauseOnAdded, responseCallback);
+            return aria2TaskService.newTorrentTask({content: content, options: options}, pauseOnAdded, responseCallback);
         };
 
         var downloadByMetalink = function (pauseOnAdded, responseCallback) {
-            var task = {
-                content: $scope.context.uploadFile.base64Content,
-                options: angular.copy($scope.context.options)
-            };
+            var options = angular.copy($scope.context.options);
+            var content = $scope.context.uploadFile.base64Content;
 
-            saveDownloadPath(task.options);
+            saveDownloadPath(options);
 
-            return aria2TaskService.newMetalinkTask(task, pauseOnAdded, responseCallback);
+            if ($scope.context.gatewayEnabled) {
+                return transferGatewayService.createContentTask(
+                    'metalink',
+                    content,
+                    options,
+                    pauseOnAdded,
+                    $scope.context.destinationId,
+                    $scope.context.targetPath
+                ).then(responseCallback, gatewayRequestFailed);
+            }
+
+            return aria2TaskService.newMetalinkTask({content: content, options: options}, pauseOnAdded, responseCallback);
         };
 
         $scope.context = {
@@ -103,6 +154,12 @@
             taskType: 'urls',
             urls: '',
             uploadFile: null,
+            gatewayEnabled: transferGatewayService.isEnabled(),
+            destinations: [],
+            destinationId: '',
+            targetPath: '/',
+            destinationLoading: false,
+            destinationError: '',
             availableOptions: (function () {
                 var keys = aria2SettingService.getNewTaskOptionKeys();
 
@@ -119,6 +176,7 @@
             },
             exportCommandApiOptions: null
         };
+        loadTransferDestinations();
 
         if (parameters.url) {
             try {
@@ -201,6 +259,9 @@
         };
 
         $scope.isNewTaskValid = function () {
+            if ($scope.context.gatewayEnabled && !$scope.context.destinationId) {
+                return false;
+            }
             if (!$scope.context.uploadFile) {
                 return $scope.newTaskForm.$valid;
             }

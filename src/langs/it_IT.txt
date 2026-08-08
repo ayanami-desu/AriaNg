@@ -187,6 +187,7 @@ POST method only supports aria2 v1.15.2 and above.=
 Aria2 RPC Request Headers=
 Support multiple request headers, one header per line, each line containing "header name: header value".=
 Aria2 RPC Secret Token=
+Transfer Gateway Token=Token del gateway di trasferimento
 Activate=
 Reset Settings=
 Confirm Reset=

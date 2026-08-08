@@ -187,6 +187,7 @@ POST method only supports aria2 v1.15.2 and above.=Метод POST поддер�
 Aria2 RPC Request Headers=Заголовки HTTP-запросов Aria2 RPC
 Support multiple request headers, one header per line, each line containing "header name: header value".=Поддержка нескольких заголовков запроса, один заголовок на строку, каждая строка содержит "имя заголовка: значение".
 Aria2 RPC Secret Token=Секретный токен Aria2 RPC
+Transfer Gateway Token=Токен шлюза передачи
 Activate=Активировать
 Reset Settings=Сбросить настройки
 Confirm Reset=Подтвердить сброс

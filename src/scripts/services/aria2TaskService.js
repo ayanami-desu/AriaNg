@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    angular.module('ariaNg').factory('aria2TaskService', ['$q', 'bittorrentPeeridService', 'ariaNgConstants', 'aria2Errors', 'aria2RpcService', 'ariaNgCommonService', 'ariaNgLocalizationService', 'ariaNgLogService', 'ariaNgSettingService', function ($q, bittorrentPeeridService, ariaNgConstants, aria2Errors, aria2RpcService, ariaNgCommonService, ariaNgLocalizationService, ariaNgLogService, ariaNgSettingService) {
+    angular.module('ariaNg').factory('aria2TaskService', ['$q', 'bittorrentPeeridService', 'ariaNgConstants', 'aria2Errors', 'aria2RpcService', 'ariaNgCommonService', 'ariaNgLocalizationService', 'ariaNgLogService', 'ariaNgSettingService', 'transferGatewayService', function ($q, bittorrentPeeridService, ariaNgConstants, aria2Errors, aria2RpcService, ariaNgCommonService, ariaNgLocalizationService, ariaNgLogService, ariaNgSettingService, transferGatewayService) {
         var getFileName = function (file) {
             if (!file) {
                 ariaNgLogService.warn('[aria2TaskService.getFileName] file is null');
@@ -748,6 +748,7 @@
                 if (!callback) {
                     ariaNgLogService.warn('[aria2TaskService.retryTasks] callback is null');
                     return;
+
                 }
 
                 var retryTaskFunc = this.retryTask;
@@ -806,48 +807,64 @@
                 return deferred.promise;
             },
             removeTasks: function (tasks, callback, silent) {
-                var runningTaskGids = [];
-                var stoppedTaskGids = [];
-
+                var taskByGid = {};
+                var allGids = [];
                 for (var i = 0; i < tasks.length; i++) {
-                    if (tasks[i].status === 'complete' || tasks[i].status === 'error' || tasks[i].status === 'removed') {
-                        stoppedTaskGids.push(tasks[i].gid);
-                    } else {
-                        runningTaskGids.push(tasks[i].gid);
+                    var gid = tasks[i].gid;
+                    if (!gid || taskByGid[gid]) {
+                        continue;
                     }
+                    taskByGid[gid] = tasks[i];
+                    allGids.push(gid);
                 }
-
-                var promises = [];
 
                 var hasSuccess = false;
                 var hasError = false;
                 var results = [];
 
-                if (runningTaskGids.length > 0) {
-                    promises.push(aria2RpcService.forceRemoveMulti({
-                        gids: runningTaskGids,
-                        silent: !!silent,
-                        callback: function (response) {
-                            ariaNgCommonService.pushArrayTo(results, response.results);
-                            hasSuccess = hasSuccess || response.hasSuccess;
-                            hasError = hasError || response.hasError;
+                var removeAria2Tasks = function (gids) {
+                    var runningTaskGids = [];
+                    var stoppedTaskGids = [];
+                    for (var index = 0; index < gids.length; index++) {
+                        var task = taskByGid[gids[index]];
+                        if (!task) {
+                            continue;
                         }
-                    }));
-                }
-
-                if (stoppedTaskGids.length > 0) {
-                    promises.push(aria2RpcService.removeDownloadResultMulti({
-                        gids: stoppedTaskGids,
-                        silent: !!silent,
-                        callback: function (response) {
-                            ariaNgCommonService.pushArrayTo(results, response.results);
-                            hasSuccess = hasSuccess || response.hasSuccess;
-                            hasError = hasError || response.hasError;
+                        if (task.status === 'complete' || task.status === 'error' || task.status === 'removed') {
+                            stoppedTaskGids.push(gids[index]);
+                        } else {
+                            runningTaskGids.push(gids[index]);
                         }
-                    }));
-                }
+                    }
 
-                return $q.all(promises).then(function onSuccess() {
+                    var promises = [];
+                    if (runningTaskGids.length > 0) {
+                        promises.push(aria2RpcService.forceRemoveMulti({
+                            gids: runningTaskGids,
+                            silent: !!silent,
+                            callback: function (response) {
+                                ariaNgCommonService.pushArrayTo(results, response.results);
+                                hasSuccess = hasSuccess || response.hasSuccess;
+                                hasError = hasError || response.hasError;
+                            }
+                        }));
+                    }
+
+                    if (stoppedTaskGids.length > 0) {
+                        promises.push(aria2RpcService.removeDownloadResultMulti({
+                            gids: stoppedTaskGids,
+                            silent: !!silent,
+                            callback: function (response) {
+                                ariaNgCommonService.pushArrayTo(results, response.results);
+                                hasSuccess = hasSuccess || response.hasSuccess;
+                                hasError = hasError || response.hasError;
+                            }
+                        }));
+                    }
+                    return $q.all(promises);
+                };
+
+                var report = function () {
                     if (callback) {
                         callback({
                             hasSuccess: !!hasSuccess,
@@ -855,6 +872,32 @@
                             results: results
                         });
                     }
+                };
+
+                var gatewayPromise = $q.when({
+                    deleted: [],
+                    not_found: allGids,
+                    failed: []
+                });
+                if (transferGatewayService.isEnabled() && allGids.length > 0) {
+                    gatewayPromise = transferGatewayService.deleteTasksByGids(allGids);
+                }
+
+                return gatewayPromise.then(function (response) {
+                    var deleted = response && response.deleted || [];
+                    var notFound = response && response.not_found || [];
+                    var failed = response && response.failed || [];
+                    hasSuccess = hasSuccess || deleted.length > 0;
+                    hasError = hasError || failed.length > 0;
+                    return removeAria2Tasks(notFound).then(report, function () {
+                        hasError = true;
+                        report();
+                    });
+                }, function () {
+                    hasError = true;
+                    return removeAria2Tasks(allGids).then(report, function () {
+                        report();
+                    });
                 });
             },
             changeTaskPosition: function (gid, position, callback, silent) {
