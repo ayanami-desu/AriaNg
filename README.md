@@ -54,6 +54,13 @@ Make sure you have [Node.js](https://nodejs.org/), [NPM](https://www.npmjs.com/)
     $ npm install
     $ gulp clean build-bundle
 
+##### Local Development
+
+    $ npm install
+    $ npm run dev
+
+The development server runs at `http://localhost:9000` and reloads source changes automatically.
+
 The builds will be placed in the dist directory.
 
 #### Usage Notes

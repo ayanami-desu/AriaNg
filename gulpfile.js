@@ -53,7 +53,8 @@ gulp.task('prepare-views', () => gulp.src([
     'src/views/**/*.html'
 ]).pipe($.htmlmin({collapseWhitespace: true}))
     .pipe($.angularTemplatecache({module: 'ariaNg', filename: 'views/templates.js', root: 'views/'}))
-    .pipe(gulp.dest('.tmp/scripts')));
+    .pipe(gulp.dest('.tmp/scripts'))
+    .pipe(reload({stream: true})));
 
 gulp.task('prepare-html', gulp.series('prepare-styles', 'prepare-scripts', 'prepare-views', () => gulp.src([
     'src/*.html'
@@ -162,7 +163,7 @@ gulp.task('build', gulp.series('lint', 'process-fonts', 'process-langs', 'proces
 
 gulp.task('build-bundle', gulp.series('lint', 'process-assets-bundle', 'process-tiny-extras', 'info'));
 
-gulp.task('serve', gulp.series('prepare-styles', 'prepare-scripts', 'prepare-fonts', () => {
+gulp.task('serve', gulp.series('prepare-styles', 'prepare-scripts', 'prepare-views', 'prepare-fonts', () => {
     browserSync({
         notify: false,
         port: 9000,
@@ -175,17 +176,18 @@ gulp.task('serve', gulp.series('prepare-styles', 'prepare-scripts', 'prepare-fon
     });
 
     gulp.watch([
+        'src/config.js',
         'src/*.html',
         'src/*.ico',
         'src/*.png',
         'src/langs/*.txt',
-        'src/views/*.html',
         'src/imgs/**/*',
         '.tmp/fonts/**/*'
     ]).on('change', reload);
 
     gulp.watch('src/styles/**/*.css', gulp.series('prepare-styles'));
     gulp.watch('src/scripts/**/*.js', gulp.series('prepare-scripts'));
+    gulp.watch('src/views/**/*.html', gulp.series('prepare-views'));
     gulp.watch('src/fonts/**/*', gulp.series('prepare-fonts'));
 }));
 
