@@ -277,6 +277,16 @@
         word-break: break-word;
     }
 
+    .gateway-task-page .gateway-task-magnet-url {
+        display: -webkit-box;
+        max-height: 60px;
+        overflow: hidden;
+        line-height: 20px;
+        text-overflow: ellipsis;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 3;
+    }
+
     .gateway-task-page .gateway-task-error {
         flex: 1 1 auto;
         max-width: none;
