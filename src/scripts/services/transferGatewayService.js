@@ -4,12 +4,26 @@
     angular.module('ariaNg').factory('transferGatewayService', ['$http', '$q', '$window', 'ariaNgSettingService', function ($http, $q, $window, ariaNgSettingService) {
         var config = $window.ariaNgTransferGateway || {};
 
+        var getPageProtocol = function () {
+            return ($window.location.protocol || 'http:').replace(/:$/, '');
+        };
+
+        var getBasePath = function () {
+            var path = config.basePath || '';
+            path = path.replace(/^\/+|\/+$/g, '');
+            return path ? '/' + path : '';
+        };
+
         var getBaseUrl = function () {
-            if (config.url) {
-                return config.url.replace(/\/$/, '');
+            var protocol = (config.protocol || getPageProtocol()).replace(/:$/, '');
+            var host = config.host || $window.location.hostname || 'localhost';
+            var port = config.port;
+
+            if (host.indexOf(':') >= 0 && host.charAt(0) !== '[') {
+                host = '[' + host + ']';
             }
 
-            return '/gateway';
+            return protocol + '://' + host + (port ? ':' + port : '') + getBasePath();
         };
 
         var getToken = function () {
