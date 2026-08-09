@@ -72,6 +72,10 @@
             titlePreview: getFinalTitle(),
             availableTime: ariaNgCommonService.getTimeOptions([1000, 2000, 3000, 5000, 10000, 30000, 60000], true),
             trueFalseOptions: [{name: 'Enabled', value: true}, {name: 'Disabled', value: false}],
+            transferGatewayProtocolOptions: [
+                {name: 'HTTP', value: 'http'},
+                {name: 'HTTPS', value: 'https'}
+            ],
             showRpcSecret: false,
             showTransferGatewayToken: false,
             isInsecureProtocolDisabled: ariaNgSettingService.isInsecureProtocolDisabled(),
@@ -172,6 +176,25 @@
 
         $scope.setTransferGatewayToken = function (value) {
             ariaNgSettingService.setTransferGatewayToken(value);
+        };
+        $scope.setTransferGatewayEnabled = function (value) {
+            ariaNgSettingService.setTransferGatewayEnabled(value);
+        };
+
+        $scope.setTransferGatewayProtocol = function (value) {
+            ariaNgSettingService.setTransferGatewayProtocol(value);
+        };
+
+        $scope.setTransferGatewayHost = function (value) {
+            ariaNgSettingService.setTransferGatewayHost(value);
+        };
+
+        $scope.setTransferGatewayPort = function (value) {
+            ariaNgSettingService.setTransferGatewayPort(value);
+        };
+
+        $scope.setTransferGatewayBasePath = function (value) {
+            ariaNgSettingService.setTransferGatewayBasePath(value);
         };
 
         $scope.setDebugMode = function (value) {
