@@ -518,6 +518,45 @@
                 value = value || '';
                 setOption('transferGatewayToken', value ? ariaNgCommonService.base64Encode(value) : value);
             },
+            getTransferGatewayConfig: function () {
+                return {
+                    enabled: getOption('transferGatewayEnabled'),
+                    protocol: getOption('transferGatewayProtocol'),
+                    host: getOption('transferGatewayHost'),
+                    port: getOption('transferGatewayPort'),
+                    basePath: getOption('transferGatewayBasePath')
+                };
+            },
+            getTransferGatewayEnabled: function () {
+                return getOption('transferGatewayEnabled');
+            },
+            setTransferGatewayEnabled: function (value) {
+                setOption('transferGatewayEnabled', value !== false);
+            },
+            getTransferGatewayProtocol: function () {
+                return getOption('transferGatewayProtocol');
+            },
+            setTransferGatewayProtocol: function (value) {
+                setOption('transferGatewayProtocol', value || 'http');
+            },
+            getTransferGatewayHost: function () {
+                return getOption('transferGatewayHost');
+            },
+            setTransferGatewayHost: function (value) {
+                setOption('transferGatewayHost', value || '');
+            },
+            getTransferGatewayPort: function () {
+                return getOption('transferGatewayPort');
+            },
+            setTransferGatewayPort: function (value) {
+                setOption('transferGatewayPort', value || '');
+            },
+            getTransferGatewayBasePath: function () {
+                return getOption('transferGatewayBasePath');
+            },
+            setTransferGatewayBasePath: function (value) {
+                setOption('transferGatewayBasePath', value || '');
+            },
             addNewRpcSetting: function () {
                 var options = getOptions();
 

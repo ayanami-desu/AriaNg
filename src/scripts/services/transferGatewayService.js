@@ -2,32 +2,39 @@
     'use strict';
 
     angular.module('ariaNg').factory('transferGatewayService', ['$http', '$q', '$window', 'ariaNgSettingService', function ($http, $q, $window, ariaNgSettingService) {
-        var config = $window.ariaNgTransferGateway || {};
-
         var getPageProtocol = function () {
             return ($window.location.protocol || 'http:').replace(/:$/, '');
         };
 
-        var getBasePath = function () {
-            var path = config.basePath || '';
-            path = path.replace(/^\/+|\/+$/g, '');
+        var getConfig = function () {
+            var settings = ariaNgSettingService.getTransferGatewayConfig();
+
+            return {
+                enabled: settings.enabled !== false,
+                protocol: (settings.protocol || getPageProtocol()).replace(/:$/, ''),
+                host: settings.host || $window.location.hostname || 'localhost',
+                port: settings.port,
+                basePath: settings.basePath || ''
+            };
+        };
+
+        var getBasePath = function (config) {
+            var path = config.basePath.replace(/^\/+|\/+$/g, '');
             return path ? '/' + path : '';
         };
 
         var getBaseUrl = function () {
-            var protocol = (config.protocol || getPageProtocol()).replace(/:$/, '');
-            var host = config.host || $window.location.hostname || 'localhost';
-            var port = config.port;
+            var config = getConfig();
+            var host = config.host;
 
             if (host.indexOf(':') >= 0 && host.charAt(0) !== '[') {
                 host = '[' + host + ']';
             }
 
-            return protocol + '://' + host + (port ? ':' + port : '') + getBasePath();
+            return config.protocol + '://' + host + (config.port ? ':' + config.port : '') + getBasePath(config);
         };
-
         var getToken = function () {
-            return ariaNgSettingService.getTransferGatewayToken() || config.token;
+            return ariaNgSettingService.getTransferGatewayToken();
         };
 
         var getHeaders = function () {
@@ -77,7 +84,7 @@
 
         return {
             isEnabled: function () {
-                return config.enabled !== false;
+                return getConfig().enabled;
             },
             getDestinations: function () {
                 return request('GET', '/api/v1/destinations');
