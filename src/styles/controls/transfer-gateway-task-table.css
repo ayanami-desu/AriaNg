@@ -65,8 +65,31 @@
 }
 
 .gateway-task-page .gateway-task-name {
+    display: flex;
+    align-items: flex-start;
+    max-width: 100%;
     margin-top: 3px;
     overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.gateway-task-page .gateway-task-name > i {
+    flex: 0 0 auto;
+    margin-top: 2px;
+    margin-right: 4px;
+}
+
+.gateway-task-page .gateway-task-name-text {
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-all;
+}
+.gateway-task-page .gateway-task-primary-content {
+    min-width: 0;
+    max-width: 100%;
 }
 
 .gateway-task-page .gateway-task-magnet-copy {
