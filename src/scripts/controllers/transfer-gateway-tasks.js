@@ -273,13 +273,13 @@
             $rootScope.loadPromise = destinationRequest.then(function () {
                 return $scope.loadTasks();
             });
-            var progressRefresh = $interval(function () {
+            var taskRefresh = $interval(function () {
                 if (hasActiveTask()) {
                     $scope.loadTasks(true);
                 }
             }, 2000);
             $scope.$on('$destroy', function () {
-                $interval.cancel(progressRefresh);
+                $interval.cancel(taskRefresh);
             });
         }
     }]);
