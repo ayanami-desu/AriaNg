@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    angular.module('ariaNg').controller('TransferGatewayTaskController', ['$rootScope', '$scope', '$interval', 'clipboard', 'ariaNgCommonService', 'transferGatewayService', function ($rootScope, $scope, $interval, clipboard, ariaNgCommonService, transferGatewayService) {
+    angular.module('ariaNg').controller('TransferGatewayTaskController', ['$rootScope', '$scope', '$interval', 'clipboard', 'ariaNgCommonService', 'aria2TaskService', 'transferGatewayService', function ($rootScope, $scope, $interval, clipboard, ariaNgCommonService, aria2TaskService, transferGatewayService) {
         var getErrorMessage = function (error, fallback) {
             if (error && error.data && error.data.error) {
                 return error.data.error;
@@ -44,17 +44,28 @@
             return status || 'Unknown';
         };
         var getMagnetTaskName = function (url) {
-            var query = url.substring(url.indexOf('?') + 1);
+            if (!angular.isString(url)) {
+                return '';
+            }
+
+            var queryStart = url.indexOf('?');
+            if (queryStart < 0) {
+                return '';
+            }
+
+            var query = url.substring(queryStart + 1);
             var match = /(?:^|&)dn=([^&]*)/i.exec(query);
             if (!match) {
                 return '';
             }
 
+            var name = match[1];
             try {
-                return decodeURIComponent(match[1].replace(/\+/g, ' '));
+                name = decodeURIComponent(name.replace(/\+/g, ' '));
             } catch (error) {
-                return match[1];
+                // Keep the original value when a malformed escape is supplied.
             }
+            return name.trim();
         };
         $scope.getTaskName = function (task) {
             if (!task) {
@@ -145,6 +156,32 @@
                 }
             }
         };
+        var taskNameRequests = {};
+        var loadTaskName = function (task) {
+            if (!task || !task.id || !task.gid || $scope.getTaskName(task) || task.status === 'completed' || task.status === 'failed' || taskNameRequests[task.gid]) {
+                return;
+            }
+
+            taskNameRequests[task.gid] = true;
+            aria2TaskService.getTaskStatus(task.gid, function (response) {
+                delete taskNameRequests[task.gid];
+                if (!response || !response.success || !response.data || !response.data.hasTaskName) {
+                    return;
+                }
+
+                for (var i = 0; i < $scope.tasks.length; i++) {
+                    if ($scope.tasks[i].id === task.id) {
+                        $scope.tasks[i].taskName = response.data.taskName;
+                        break;
+                    }
+                }
+            }, true);
+        };
+        var loadTaskNames = function (tasks) {
+            for (var i = 0; i < tasks.length; i++) {
+                loadTaskName(tasks[i]);
+            }
+        };
         var taskRequest = null;
 
         var hasActiveTask = function () {
@@ -164,6 +201,7 @@
             taskRequest = transferGatewayService.getTasks($scope.filters).then(function (tasks) {
                 $scope.tasks = angular.isArray(tasks) ? tasks : [];
                 clearMissingSelections();
+                loadTaskNames($scope.tasks);
                 return $scope.tasks;
             }, function (error) {
                 if (!silent) {
