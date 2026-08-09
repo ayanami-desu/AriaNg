@@ -43,12 +43,41 @@
 
             return status || 'Unknown';
         };
+        var getMagnetTaskName = function (url) {
+            var query = url.substring(url.indexOf('?') + 1);
+            var match = /(?:^|&)dn=([^&]*)/i.exec(query);
+            if (!match) {
+                return '';
+            }
+
+            try {
+                return decodeURIComponent(match[1].replace(/\+/g, ' '));
+            } catch (error) {
+                return match[1];
+            }
+        };
         $scope.getTaskName = function (task) {
             if (!task) {
                 return '';
             }
 
-            return task.task_name || task.name || task.taskName || '';
+            var name = task.task_name || task.name || task.taskName || '';
+            if (name) {
+                return name;
+            }
+
+            if (angular.isArray(task.urls) && task.urls.length > 0 && $scope.isMagnetTask(task)) {
+                var magnetName = getMagnetTaskName(task.urls[0]);
+                if (magnetName) {
+                    return magnetName;
+                }
+            }
+
+            if (angular.isArray(task.file_names) && task.file_names.length > 0) {
+                return task.file_names[0];
+            }
+
+            return '';
         };
 
         $scope.isMagnetTask = function (task) {

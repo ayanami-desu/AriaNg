@@ -77,7 +77,7 @@
                                     <div class="gateway-task-name" ng-if="getTaskName(task)">
                                         <i class="fa fa-tag"></i> <span ng-bind="getTaskName(task)" title="{{getTaskName(task)}}"></span>
                                     </div>
-                                    <div class="gateway-task-url text-muted" ng-if="task.urls && task.urls.length" ng-bind="task.urls[0]" title="{{task.urls[0]}}"></div>
+                                    <div class="gateway-task-url text-muted" ng-class="{'gateway-task-magnet-url': isMagnetTask(task)}" ng-if="task.urls && task.urls.length" ng-bind="task.urls[0]" title="{{task.urls[0]}}"></div>
                                     <button type="button" class="btn btn-xs btn-default gateway-task-magnet-copy" ng-if="isMagnetTask(task)" ng-click="copyMagnet(task)" title="{{'Copy Magnet Link' | translate}}">
                                         <i class="fa fa-magnet"></i> <span translate>Copy Magnet Link</span>
                                     </button>
