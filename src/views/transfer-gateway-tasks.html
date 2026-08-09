@@ -84,16 +84,7 @@
                                 </div>
                             </td>
                             <td data-label="{{'Task Status' | translate}}">
-                                <div class="gateway-task-status-content">
-                                    <span class="label gateway-task-status" ng-class="{'label-success': task.status === 'completed', 'label-danger': task.status === 'failed', 'label-primary': task.status === 'downloading' || task.status === 'transferring', 'label-warning': task.status === 'queued' || task.status === 'transfer_pending'}" ng-bind="statusLabel(task.status) | translate"></span>
-                                    <div class="progress gateway-transfer-progress" ng-if="task.transfer_total_bytes > 0">
-                                        <div class="progress-bar" ng-class="{'progress-bar-success': task.status === 'completed', 'progress-bar-danger': task.status === 'failed', 'progress-bar-info': task.status !== 'completed' && task.status !== 'failed'}" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{task.transfer_progress}}" ng-style="{'width': task.transfer_progress + '%'}"></div>
-                                    </div>
-                                    <div class="gateway-transfer-progress-text" ng-if="task.transfer_total_bytes > 0">
-                                        <span ng-bind="(task.transferred_bytes | readableVolume) + ' / ' + (task.transfer_total_bytes | readableVolume) + ' (' + task.transfer_progress + '%)'"></span>
-                                        <span ng-if="task.status === 'transferring' && task.transfer_speed > 0" ng-bind="' @ ' + (task.transfer_speed | readableVolume) + '/s'"></span>
-                                    </div>
-                                </div>
+                                <span class="label gateway-task-status" ng-class="{'label-success': task.status === 'completed', 'label-danger': task.status === 'failed', 'label-primary': task.status === 'downloading' || task.status === 'transferring', 'label-warning': task.status === 'queued' || task.status === 'transfer_pending'}" ng-bind="statusLabel(task.status) | translate"></span>
                             </td>
                             <td data-label="{{'Destination' | translate}}" ng-bind="task.destination || task.destination_id"></td>
                             <td data-label="{{'Transfer Path' | translate}}" ng-bind="task.target_path"></td>
