@@ -43,6 +43,7 @@
 
             return status || 'Unknown';
         };
+        var taskNameCache = {};
         var getMagnetTaskName = function (url) {
             if (!angular.isString(url)) {
                 return '';
@@ -86,6 +87,9 @@
 
             if (angular.isArray(task.file_names) && task.file_names.length > 0) {
                 return task.file_names[0];
+            }
+            if (task.id && taskNameCache[task.id]) {
+                return taskNameCache[task.id];
             }
 
             return '';
@@ -167,6 +171,9 @@
                 delete taskNameRequests[task.gid];
                 if (!response || !response.success || !response.data || !response.data.hasTaskName) {
                     return;
+                }
+                if (response.data.taskName) {
+                    taskNameCache[task.id] = response.data.taskName;
                 }
 
                 for (var i = 0; i < $scope.tasks.length; i++) {

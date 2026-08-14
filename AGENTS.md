@@ -25,3 +25,6 @@
 ## Release safety
 
 - `scripts/publish_dailybuild.sh` uses SSH to push `dist/` to the `mayswind/AriaNg-DailyBuild` repository from the CircleCI master job. Treat it as CI-only; do not run it locally unless explicitly requested.
+
+
+Backend code at `../aria2-transfer-gateway`,
