@@ -41,6 +41,8 @@
             'Copy Magnet Link': 'Copy Magnet Link',
             'Help': 'Help',
             'Search': 'Search',
+            'Previous Page': 'Previous Page',
+            'Next Page': 'Next Page',
             'Default': 'Default',
             'Expand': 'Expand',
             'Collapse': 'Collapse',
@@ -442,6 +444,7 @@
                 'task.verifying-percent': 'Verifying ({{verifiedPercent}}%)',
                 'settings.file-count': '({{count}} Files)',
                 'settings.total-count': '(Total Count: {{count}})',
+                'task.file-list-page': 'Page {{current}} of {{total}}',
                 'debug.latest-logs': 'Latest {{count}} Logs'
             },
             'rpc': {

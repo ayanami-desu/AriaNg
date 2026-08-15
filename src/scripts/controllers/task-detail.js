@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    angular.module('ariaNg').controller('TaskDetailController', ['$rootScope', '$scope', '$routeParams', '$interval', 'clipboard', 'aria2RpcErrors', 'ariaNgFileTypes', 'ariaNgCommonService', 'ariaNgSettingService', 'ariaNgMonitorService', 'aria2TaskService', 'aria2SettingService', 'transferGatewayService', function ($rootScope, $scope, $routeParams, $interval, clipboard, aria2RpcErrors, ariaNgFileTypes, ariaNgCommonService, ariaNgSettingService, ariaNgMonitorService, aria2TaskService, aria2SettingService, transferGatewayService) {
+    angular.module('ariaNg').controller('TaskDetailController', ['$rootScope', '$scope', '$routeParams', '$interval', '$filter', 'clipboard', 'aria2RpcErrors', 'ariaNgFileTypes', 'ariaNgCommonService', 'ariaNgSettingService', 'ariaNgMonitorService', 'aria2TaskService', 'aria2SettingService', 'transferGatewayService', function ($rootScope, $scope, $routeParams, $interval, $filter, clipboard, aria2RpcErrors, ariaNgFileTypes, ariaNgCommonService, ariaNgSettingService, ariaNgMonitorService, aria2TaskService, aria2SettingService, transferGatewayService) {
         var tabStatusItems = [
             {
                 name: 'overview',
@@ -55,6 +55,34 @@
                     $scope.magnetUri = magnetUriFromUrls(gatewayTask.urls);
                 }
             }, angular.noop);
+        };
+        var fileListPageSize = 200;
+
+        var updateFileListPageRows = function (resetPage) {
+            var context = $scope.context;
+            var files = ($scope.task && $scope.task.files) || [];
+            var orderType = ($scope.task && $scope.task.multiDir) ? null : ariaNgSettingService.getFileListDisplayOrder();
+            var orderedFiles = $filter('fileOrderBy')(files, orderType);
+            var visibleFiles = [];
+
+            for (var i = 0; i < orderedFiles.length; i++) {
+                var file = orderedFiles[i];
+
+                if (file.relativePath && context.collapsedDirs[file.relativePath]) {
+                    continue;
+                }
+
+                visibleFiles.push(file);
+            }
+
+            context.fileListRows = visibleFiles;
+            context.fileListVisibleCount = visibleFiles.length;
+            context.fileListPageCount = Math.max(1, Math.ceil(visibleFiles.length / fileListPageSize));
+
+            var page = resetPage ? 1 : (parseInt(context.fileListPage, 10) || 1);
+            page = Math.min(page, context.fileListPageCount);
+            context.fileListPage = page;
+            context.fileListPageRows = visibleFiles.slice((page - 1) * fileListPageSize, page * fileListPageSize);
         };
 
         var getVisibleTabOrders = function () {
@@ -146,6 +174,7 @@
 
             $scope.task = ariaNgCommonService.copyObjectTo(task, $scope.task);
             updateGatewayDetails($scope.task);
+            updateFileListPageRows(false);
 
             $rootScope.taskContext.list = [$scope.task];
             $rootScope.taskContext.selected = {};
@@ -311,6 +340,10 @@
             isEnableSpeedChart: ariaNgSettingService.getDownloadTaskRefreshInterval() > 0,
             showPiecesInfo: ariaNgSettingService.getShowPiecesInfoInTaskDetailPage() !== 'never',
             showChooseFilesToolbar: false,
+            fileListPage: 1,
+            fileListPageCount: 1,
+            fileListPageRows: [],
+            fileListVisibleCount: 0,
             fileExtensions: [],
             collapsedDirs: {},
             btPeers: [],
@@ -366,6 +399,7 @@
             }
 
             ariaNgSettingService.setFileListDisplayOrder(newType.getValue());
+            updateFileListPageRows(false);
         };
 
         $scope.isSetFileListDisplayOrder = function (type) {
@@ -381,6 +415,18 @@
             }
 
             return ariaNgSettingService.getFileListDisplayOrder();
+        };
+        $scope.changeFileListPage = function (delta) {
+            var context = $scope.context;
+            var page = (parseInt(context.fileListPage, 10) || 1) + delta;
+            var pageCount = context.fileListPageCount || 1;
+
+            if (page < 1 || page > pageCount || page === context.fileListPage) {
+                return;
+            }
+
+            context.fileListPage = page;
+            context.fileListPageRows = context.fileListRows.slice((page - 1) * fileListPageSize, page * fileListPageSize);
         };
 
         $scope.showChooseFilesToolbar = function () {
@@ -454,6 +500,7 @@
             }
 
             updateAllDirNodesSelectedStatus();
+            updateFileListPageRows(false);
         };
         $scope.selectAllFiles = function () {
             if (!$scope.task || !$scope.task.files) {
@@ -509,6 +556,7 @@
             }
 
             updateAllDirNodesSelectedStatus();
+            updateFileListPageRows(false);
         };
 
         $scope.saveChoosedFiles = function () {
@@ -657,6 +705,7 @@
             }
 
             updateAllDirNodesSelectedStatus();
+            updateFileListPageRows(false);
         };
 
         $('#custom-choose-file-modal').on('hide.bs.modal', function (e) {
@@ -667,13 +716,14 @@
             if (updateNodeSelectedStatus) {
                 updateAllDirNodesSelectedStatus();
             }
+            updateFileListPageRows(false);
 
             if (!$scope.context.showChooseFilesToolbar) {
                 setSelectFiles(true);
             }
         };
 
-        $scope.collapseDir = function (dirNode, newValue, forceRecurse) {
+        $scope.collapseDir = function (dirNode, newValue, forceRecurse, suppressRefresh) {
             var nodePath = dirNode.nodePath;
 
             if (angular.isUndefined(newValue)) {
@@ -682,12 +732,15 @@
 
             if (newValue || forceRecurse) {
                 for (var i = 0; i < dirNode.subDirs.length; i++) {
-                    $scope.collapseDir(dirNode.subDirs[i], newValue);
+                    $scope.collapseDir(dirNode.subDirs[i], newValue, forceRecurse, true);
                 }
             }
 
             if (nodePath) {
                 $scope.context.collapsedDirs[nodePath] = newValue;
+            }
+            if (!suppressRefresh) {
+                updateFileListPageRows(false);
             }
         };
 
@@ -703,13 +756,15 @@
                     continue;
                 }
 
-                $scope.collapseDir(node, newValue, true);
+                $scope.collapseDir(node, newValue, true, true);
             }
+            updateFileListPageRows(false);
         };
 
         $scope.setSelectedNode = function (dirNode) {
             setSelectedNode(dirNode, dirNode.selected);
             updateAllDirNodesSelectedStatus();
+            updateFileListPageRows(false);
 
             if (!$scope.context.showChooseFilesToolbar) {
                 $scope.setSelectedFile(false);
