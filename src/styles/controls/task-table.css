@@ -20,6 +20,19 @@
     padding-top: 4px;
     padding-bottom: 4px;
 }
+.task-table .task-file-list-pagination {
+    padding-top: 8px;
+    padding-bottom: 8px;
+    text-align: center;
+}
+
+.task-table .task-file-list-page-info {
+    display: inline-block;
+    min-width: 80px;
+    margin-left: 8px;
+    margin-right: 8px;
+    font-size: 12px;
+}
 
 
 .task-table .task-table-title a {

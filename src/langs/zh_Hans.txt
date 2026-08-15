@@ -37,6 +37,8 @@ Copy Download Url=复制下载链接
 Copy Magnet Link=复制磁力链接
 Help=帮助
 Search=搜索
+Previous Page=上一页
+Next Page=下一页
 Default=默认
 Expand=展开
 Collapse=折叠
@@ -441,6 +443,7 @@ task.error-occurred=发生错误 ({{errorcode}})
 task.verifying-percent=正在验证 ({{verifiedPercent}}%)
 settings.file-count=({{count}} 个文件)
 settings.total-count=(共计: {{count}}个)
+task.file-list-page=第 {{current}} / {{total}} 页
 debug.latest-logs=最近 {{count}} 条日志
 
 [rpc.error]
