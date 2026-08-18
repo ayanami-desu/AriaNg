@@ -45,10 +45,55 @@
                                 <p ng-bind="'format.task.new.download-links' | translate: {count: getValidUrlsCount()}">Download Links:</p>
                                 <div class="form-group has-feedback no-margin" ng-class="{ 'has-error' : newTaskForm.urls.$invalid && newTaskForm.urls.$dirty, 'has-success' : newTaskForm.urls.$valid && newTaskForm.urls.$dirty }">
                                     <textarea name="urls" class="form-control" rows="10" autofocus="autofocus" ng-auto-focus ng-valid-urls
-                                              ng-model="context.urls" ng-required="true" ng-keydown="urlTextboxKeyDown($event)"
+                                              ng-model="context.urls" ng-required="true" ng-change="magnetInputChanged()" ng-keydown="urlTextboxKeyDown($event)"
                                               ng-placeholder="'Support multiple URLs, one URL per line.' | translate"></textarea>
                                     <div class="form-control-icon" ng-if="newTaskForm.urls.$dirty">
                                         <i class="fa form-control-feedback" ng-class="{'fa-check':newTaskForm.urls.$valid, 'fa-times':newTaskForm.urls.$invalid}"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="new-task-table" ng-if="context.gatewayEnabled && canPreviewTorrent()">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <button type="button" class="btn btn-primary btn-sm" ng-click="previewTorrentFiles()"
+                                        ng-disabled="context.torrentPreviewLoading">
+                                    <i class="fa fa-list" aria-hidden="true"></i>
+                                    <span ng-if="!context.torrentPreviewLoading" translate>Load Torrent Files</span>
+                                    <span ng-if="context.torrentPreviewLoading" translate>Loading Torrent Files...</span>
+                                </button>
+                                <span class="text-danger" ng-if="context.torrentPreviewError" ng-bind="context.torrentPreviewError"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="new-task-table" ng-if="isCurrentTorrentPreviewForView()">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="settings-table striped hoverable">
+                                    <div class="settings-table-title">
+                                        <div class="row">
+                                            <div class="col-sm-8"><span translate>File Name</span></div>
+                                            <div class="col-sm-4"><span translate>File Size</span></div>
+                                        </div>
+                                    </div>
+                                    <div class="settings-table-toolbar">
+                                        <button type="button" class="btn btn-primary btn-xs" ng-click="selectAllTorrentFiles(true)" translate>Select All</button>
+                                        <button type="button" class="btn btn-default btn-xs" ng-click="selectAllTorrentFiles(false)" translate>Select None</button>
+                                        <span class="description-inline"><span translate>Selected Files</span>: {{getTorrentSelectedCount()}} / {{context.torrentPreview.files.length}}</span>
+                                    </div>
+                                    <div class="settings-table-body">
+                                        <div class="row" ng-repeat="file in context.torrentPreview.files track by file.index">
+                                            <div class="col-sm-8">
+                                                <div class="checkbox checkbox-primary">
+                                                    <input id="{{'torrent_file_' + file.index}}" type="checkbox" ng-model="file.selected"/>
+                                                    <label for="{{'torrent_file_' + file.index}}" class="allow-word-break" ng-bind="file.path" title="{{file.path}}"></label>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <span class="task-size" ng-bind="file.length | readableVolume"></span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

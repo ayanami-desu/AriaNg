@@ -70,12 +70,13 @@
             };
         };
 
-        var createTask = function (type, content, urls, options, pause, destinationId, targetPath) {
+        var createTask = function (type, content, urls, options, pause, destinationId, targetPath, selectFiles) {
             return request('POST', '/api/v1/tasks', {
                 type: type,
                 content: content || '',
                 urls: urls || [],
                 options: options || {},
+                select_files: selectFiles || [],
                 pause: !!pause,
                 destination_id: destinationId,
                 target_path: targetPath
@@ -83,6 +84,16 @@
         };
 
         return {
+            previewMagnet: function (url) {
+                return request('POST', '/api/v1/torrents/preview', {
+                    url: url
+                });
+            },
+            previewTorrent: function (content) {
+                return request('POST', '/api/v1/torrents/preview', {
+                    content: content
+                });
+            },
             isEnabled: function () {
                 return getConfig().enabled;
             },
@@ -122,8 +133,8 @@
                     };
                 });
             },
-            createContentTask: function (type, content, options, pause, destinationId, targetPath) {
-                return createTask(type, content, [], options, pause, destinationId, targetPath);
+            createContentTask: function (type, content, options, pause, destinationId, targetPath, selectFiles) {
+                return createTask(type, content, [], options, pause, destinationId, targetPath, selectFiles);
             },
             getTasks: function (filters) {
                 filters = filters || {};

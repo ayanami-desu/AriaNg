@@ -52,6 +52,82 @@
             return error;
         };
 
+        var getSingleMagnetUrl = function () {
+            var urls = ariaNgCommonService.parseUrlsFromOriginInput($scope.context.urls);
+            if (!urls || urls.length !== 1) {
+                return '';
+            }
+            var url = urls[0].trim();
+            return /^magnet:/i.test(url) ? url : '';
+        };
+
+        var getCurrentTorrentPreviewRequest = function () {
+            if (!$scope.context.gatewayEnabled) {
+                return null;
+            }
+            if ($scope.context.taskType === 'torrent' && $scope.context.uploadFile) {
+                return {
+                    type: 'torrent',
+                    value: $scope.context.uploadFile.base64Content
+                };
+            }
+            if ($scope.context.taskType === 'urls') {
+                var magnet = getSingleMagnetUrl();
+                if (magnet) {
+                    return {
+                        type: 'magnet',
+                        value: magnet
+                    };
+                }
+            }
+            return null;
+        };
+
+        var isCurrentTorrentPreview = function () {
+            var request = getCurrentTorrentPreviewRequest();
+            return !!request && !!$scope.context.torrentPreview &&
+                $scope.context.torrentPreview.sourceType === request.type &&
+                $scope.context.torrentPreview.source === request.value;
+        };
+
+        var getSelectedTorrentFiles = function () {
+            var selected = [];
+            if (!isCurrentTorrentPreview()) {
+                return selected;
+            }
+            var files = $scope.context.torrentPreview.files || [];
+            for (var i = 0; i < files.length; i++) {
+                if (files[i].selected) {
+                    selected.push(files[i].index);
+                }
+            }
+            return selected;
+        };
+
+        var clearTorrentPreview = function () {
+            $scope.context.torrentPreview = null;
+            $scope.context.torrentPreviewError = '';
+        };
+
+        var downloadByTorrentPreview = function (pauseOnAdded, responseCallback) {
+            var selectedFiles = getSelectedTorrentFiles();
+            if (selectedFiles.length === 0) {
+                ariaNgCommonService.showError('Select at least one torrent file');
+                return null;
+            }
+            var options = angular.copy($scope.context.options);
+            saveDownloadPath(options);
+            return transferGatewayService.createContentTask(
+                'torrent',
+                $scope.context.torrentPreview.content,
+                options,
+                pauseOnAdded,
+                $scope.context.destinationId,
+                $scope.context.targetPath,
+                selectedFiles
+            ).then(responseCallback, gatewayRequestFailed);
+        };
+
         var loadTransferDestinations = function () {
             if (!$scope.context.gatewayEnabled) {
                 return;
@@ -93,6 +169,9 @@
         };
 
         var downloadByLinks = function (pauseOnAdded, responseCallback) {
+            if ($scope.context.gatewayEnabled && isCurrentTorrentPreview()) {
+                return downloadByTorrentPreview(pauseOnAdded, responseCallback);
+            }
             var options = angular.copy($scope.context.options);
             var tasks = getDownloadTasksByLinks(options);
 
@@ -110,6 +189,9 @@
         };
 
         var downloadByTorrent = function (pauseOnAdded, responseCallback) {
+            if ($scope.context.gatewayEnabled && isCurrentTorrentPreview()) {
+                return downloadByTorrentPreview(pauseOnAdded, responseCallback);
+            }
             var options = angular.copy($scope.context.options);
             var content = $scope.context.uploadFile.base64Content;
 
@@ -128,6 +210,7 @@
 
             return aria2TaskService.newTorrentTask({content: content, options: options}, pauseOnAdded, responseCallback);
         };
+
 
         var downloadByMetalink = function (pauseOnAdded, responseCallback) {
             var options = angular.copy($scope.context.options);
@@ -160,6 +243,9 @@
             targetPath: '/',
             destinationLoading: false,
             destinationError: '',
+            torrentPreview: null,
+            torrentPreviewLoading: false,
+            torrentPreviewError: '',
             availableOptions: (function () {
                 var keys = aria2SettingService.getNewTaskOptionKeys();
 
@@ -230,12 +316,69 @@
             });
         };
 
+        $scope.canPreviewTorrent = function () {
+            return !!getCurrentTorrentPreviewRequest();
+        };
+
+        $scope.isCurrentTorrentPreviewForView = function () {
+            return isCurrentTorrentPreview();
+        };
+
+        $scope.previewTorrentFiles = function () {
+            var request = getCurrentTorrentPreviewRequest();
+            if (!request) {
+                return;
+            }
+            $scope.context.torrentPreviewLoading = true;
+            $scope.context.torrentPreviewError = '';
+            var previewPromise = request.type === 'magnet' ?
+                transferGatewayService.previewMagnet(request.value) :
+                transferGatewayService.previewTorrent(request.value);
+            previewPromise.then(function (preview) {
+                preview = preview || {};
+                preview.files = preview.files || [];
+                for (var i = 0; i < preview.files.length; i++) {
+                    preview.files[i].selected = true;
+                }
+                preview.sourceType = request.type;
+                preview.source = request.value;
+                $scope.context.torrentPreview = preview;
+            }, function (error) {
+                $scope.context.torrentPreview = null;
+                $scope.context.torrentPreviewError = error && error.data && error.data.error ? error.data.error : 'Unable to load torrent files';
+                gatewayRequestFailed(error);
+            }).finally(function () {
+                $scope.context.torrentPreviewLoading = false;
+            });
+        };
+
+        $scope.selectAllTorrentFiles = function (selected) {
+            if (!isCurrentTorrentPreview()) {
+                return;
+            }
+            var files = $scope.context.torrentPreview.files || [];
+            for (var i = 0; i < files.length; i++) {
+                files[i].selected = selected;
+            }
+        };
+
+        $scope.getTorrentSelectedCount = function () {
+            return getSelectedTorrentFiles().length;
+        };
+
+        $scope.magnetInputChanged = function () {
+            if ($scope.context.torrentPreview && !isCurrentTorrentPreview()) {
+                clearTorrentPreview();
+            }
+        };
+
         $scope.openTorrent = function () {
             ariaNgFileService.openFileContent({
                 scope: $scope,
                 fileFilter: '.torrent',
                 fileType: 'binary'
             }, function (result) {
+                clearTorrentPreview();
                 $scope.context.uploadFile = result;
                 $scope.context.taskType = 'torrent';
                 $scope.changeTab('options');
@@ -250,6 +393,7 @@
                 fileFilter: '.meta4,.metalink',
                 fileType: 'binary'
             }, function (result) {
+                clearTorrentPreview();
                 $scope.context.uploadFile = result;
                 $scope.context.taskType = 'metalink';
                 $scope.changeTab('options');
@@ -260,6 +404,12 @@
 
         $scope.isNewTaskValid = function () {
             if ($scope.context.gatewayEnabled && !$scope.context.destinationId) {
+                return false;
+            }
+            if ($scope.context.torrentPreviewLoading) {
+                return false;
+            }
+            if (isCurrentTorrentPreview() && getSelectedTorrentFiles().length === 0) {
                 return false;
             }
             if (!$scope.context.uploadFile) {
