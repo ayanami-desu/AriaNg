@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    angular.module('ariaNg').factory('transferGatewayService', ['$http', '$q', '$window', 'ariaNgSettingService', function ($http, $q, $window, ariaNgSettingService) {
+    angular.module('ariaNg').factory('transferGatewayService', ['$http', '$q', '$timeout', '$window', 'ariaNgSettingService', function ($http, $q, $timeout, $window, ariaNgSettingService) {
         var getPageProtocol = function () {
             return ($window.location.protocol || 'http:').replace(/:$/, '');
         };
@@ -60,6 +60,32 @@
             });
         };
 
+        var previewPollInterval = 250;
+        var previewJobError = function (job) {
+            return {
+                data: {
+                    error: job && job.error ? job.error : 'Unable to load torrent files'
+                }
+            };
+        };
+        var waitForPreview = function (job) {
+            if (!job || !job.id) {
+                return $q.reject(previewJobError(job));
+            }
+            if (job.status === 'completed') {
+                return $q.when(job.preview || {});
+            }
+            if (job.status === 'failed' || job.status === 'cancelled') {
+                return $q.reject(previewJobError(job));
+            }
+            return $timeout(function () {
+                return request('GET', '/api/v1/torrents/preview/' + encodeURIComponent(job.id));
+            }, previewPollInterval).then(waitForPreview);
+        };
+        var startPreview = function (data) {
+            return request('POST', '/api/v1/torrents/preview', data).then(waitForPreview);
+        };
+
         var toAriaNgResponse = function (task) {
             return {
                 success: true,
@@ -85,12 +111,12 @@
 
         return {
             previewMagnet: function (url) {
-                return request('POST', '/api/v1/torrents/preview', {
+                return startPreview({
                     url: url
                 });
             },
             previewTorrent: function (content) {
-                return request('POST', '/api/v1/torrents/preview', {
+                return startPreview({
                     content: content
                 });
             },
