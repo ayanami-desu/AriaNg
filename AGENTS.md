@@ -24,7 +24,7 @@
 
 ## Release safety
 
-- `scripts/publish_dailybuild.sh` uses SSH to push `dist/` to the `mayswind/AriaNg-DailyBuild` repository from the CircleCI master job. Treat it as CI-only; do not run it locally unless explicitly requested.
+- Release and snapshot builds run in GitHub Actions: `.github/workflows/build-release.yml` publishes on version tags and `.github/workflows/build-snapshot.yml` publishes on `master`. The fork's own image workflow is `.github/workflows/publish-image.yml`. Do not run release publishing locally unless explicitly requested.
 
 
 Backend code at `../aria2-transfer-gateway`,
