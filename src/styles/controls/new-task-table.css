@@ -41,3 +41,36 @@
 .settings-table .new-task-filter-title {
     padding-top: 6px;
 }
+
+/* torrent-preview-modal */
+.torrent-preview-modal .torrent-preview-filters {
+    margin-bottom: 15px;
+}
+
+.torrent-preview-modal .torrent-preview-toolbar {
+    margin-bottom: 8px;
+}
+
+.torrent-preview-modal .torrent-preview-visible-count {
+    margin-left: 12px;
+}
+
+.torrent-preview-modal .torrent-preview-file-list {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.torrent-preview-modal .settings-table-body {
+    max-height: calc(100vh - 360px);
+    overflow-y: auto;
+}
+
+@media (max-width: 767px) {
+    .torrent-preview-modal .torrent-preview-filters > div {
+        margin-bottom: 8px;
+    }
+
+    .torrent-preview-modal .settings-table-body {
+        max-height: calc(100vh - 410px);
+    }
+}

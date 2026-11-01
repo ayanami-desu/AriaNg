@@ -90,6 +90,35 @@
                 $scope.context.torrentPreview.source === request.value;
         };
 
+        var getFilteredTorrentFiles = function () {
+            if (!isCurrentTorrentPreview()) {
+                return [];
+            }
+
+            var files = $scope.context.torrentPreview.files || [];
+            var query = ($scope.context.torrentPreviewSearch || '').trim().toLowerCase();
+            var filter = $scope.context.torrentPreviewFilter || 'all';
+            var filtered = [];
+
+            for (var i = 0; i < files.length; i++) {
+                var file = files[i];
+                var path = file.path || '';
+
+                if (query && path.toLowerCase().indexOf(query) < 0) {
+                    continue;
+                }
+                if (filter === 'selected' && !file.selected) {
+                    continue;
+                }
+                if (filter === 'unselected' && file.selected) {
+                    continue;
+                }
+                filtered.push(file);
+            }
+
+            return filtered;
+        };
+
         var getSelectedTorrentFiles = function () {
             var selected = [];
             if (!isCurrentTorrentPreview()) {
@@ -103,9 +132,11 @@
             }
             return selected;
         };
-
         var clearTorrentPreview = function () {
+            angular.element('#torrent-preview-modal').modal('hide');
             $scope.context.torrentPreview = null;
+            $scope.context.torrentPreviewSearch = '';
+            $scope.context.torrentPreviewFilter = 'all';
             $scope.context.torrentPreviewError = '';
         };
 
@@ -245,6 +276,8 @@
             destinationError: '',
             torrentPreview: null,
             torrentPreviewLoading: false,
+            torrentPreviewSearch: '',
+            torrentPreviewFilter: 'all',
             torrentPreviewError: '',
             availableOptions: (function () {
                 var keys = aria2SettingService.getNewTaskOptionKeys();
@@ -324,6 +357,18 @@
             return isCurrentTorrentPreview();
         };
 
+        $scope.getFilteredTorrentFiles = function () {
+            return getFilteredTorrentFiles();
+        };
+
+        $scope.showTorrentPreview = function () {
+            if (isCurrentTorrentPreview()) {
+                angular.element('#torrent-preview-modal').modal('show');
+                return;
+            }
+            $scope.previewTorrentFiles();
+        };
+
         $scope.previewTorrentFiles = function () {
             var request = getCurrentTorrentPreviewRequest();
             if (!request) {
@@ -342,7 +387,10 @@
                 }
                 preview.sourceType = request.type;
                 preview.source = request.value;
+                $scope.context.torrentPreviewSearch = '';
+                $scope.context.torrentPreviewFilter = 'all';
                 $scope.context.torrentPreview = preview;
+                angular.element('#torrent-preview-modal').modal('show');
             }, function (error) {
                 $scope.context.torrentPreview = null;
                 $scope.context.torrentPreviewError = error && error.data && error.data.error ? error.data.error : 'Unable to load torrent files';
