@@ -34,8 +34,6 @@
                     return aria2GlobalAvailableOptions.httpFtpSFtpOptions;
                 } else if (type === 'http') {
                     return aria2GlobalAvailableOptions.httpOptions;
-                } else if (type === 'ftp-sftp') {
-                    return aria2GlobalAvailableOptions.ftpSFtpOptions;
                 } else if (type === 'bt') {
                     return aria2GlobalAvailableOptions.btOptions;
                 } else if (type === 'metalink') {
