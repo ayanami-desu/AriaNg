@@ -34,8 +34,14 @@
                     return aria2GlobalAvailableOptions.httpFtpSFtpOptions;
                 } else if (type === 'http') {
                     return aria2GlobalAvailableOptions.httpOptions;
+                } else if (type === 'sftp') {
+                    return aria2GlobalAvailableOptions.sftpOptions;
                 } else if (type === 'bt') {
                     return aria2GlobalAvailableOptions.btOptions;
+                } else if (type === 'ed2k') {
+                    return aria2GlobalAvailableOptions.ed2kOptions;
+                } else if (type === 'media') {
+                    return aria2GlobalAvailableOptions.mediaOptions;
                 } else if (type === 'metalink') {
                     return aria2GlobalAvailableOptions.metalinkOptions;
                 } else if (type === 'rpc') {

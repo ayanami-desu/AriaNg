@@ -36,7 +36,8 @@
             type: 'integer',
             defaultValue: '5',
             required: true,
-            min: 1
+            min: 1,
+            max: 1000
         },
         'check-integrity': {
             type: 'boolean',
@@ -83,10 +84,10 @@
         },
         'max-connection-per-server': {
             type: 'integer',
-            defaultValue: '1',
+            defaultValue: '16',
             required: true,
             min: 1,
-            max: 16
+            max: 256
         },
         'max-file-not-found': {
             type: 'integer',
@@ -139,9 +140,10 @@
         },
         'split': {
             type: 'integer',
-            defaultValue: '5',
+            defaultValue: '16',
             required: true,
-            min: 1
+            min: 1,
+            max: 256
         },
         'timeout': {
             type: 'integer',
@@ -234,7 +236,8 @@
             type: 'integer',
             defaultValue: '55',
             required: true,
-            min: 0
+            min: 0,
+            max: 65535
         },
         'bt-seed-unverified': {
             type: 'boolean',
@@ -265,7 +268,9 @@
         'listen-port': {
             type: 'integer',
             readonly: true,
-            defaultValue: '6881-6999'
+            defaultValue: '6881',
+            min: 1,
+            max: 65535
         },
         'max-overall-upload-limit': {
             type: 'string',
@@ -322,7 +327,9 @@
         'rpc-listen-port': {
             type: 'integer',
             readonly: true,
-            defaultValue: '6800'
+            defaultValue: '6800',
+            min: 1024,
+            max: 65535
         },
         'rpc-max-request-size': {
             type: 'string',
@@ -412,9 +419,9 @@
         },
         'min-tls-version': {
             type: 'option',
-            options: ['SSLv3', 'TLSv1', 'TLSv1.1', 'TLSv1.2'],
+            options: ['TLSv1.1', 'TLSv1.2', 'TLSv1.3'],
             readonly: true,
-            defaultValue: 'TLSv1'
+            defaultValue: 'TLSv1.2'
         },
         'log-level': {
             type: 'option',
@@ -474,6 +481,288 @@
             suffix: 'Seconds',
             readonly: true,
             defaultValue: '0'
+        },
+
+        // Options introduced by aria2-next
+        'load-cookies': {
+            type: 'string'
+        },
+        'ca-certificate': {
+            type: 'string'
+        },
+        'certificate': {
+            type: 'string'
+        },
+        'private-key': {
+            type: 'string'
+        },
+        'dns-over-https': {
+            type: 'string'
+        },
+        'interface': {
+            type: 'string'
+        },
+        'sftp-user': {
+            type: 'string'
+        },
+        'sftp-passwd': {
+            type: 'string'
+        },
+        'ssh-host-key-sha256': {
+            type: 'string'
+        },
+        'bt-anonymous-mode': {
+            type: 'boolean',
+            defaultValue: 'false'
+        },
+        'bt-blocklist-scope': {
+            type: 'option',
+            options: ['peers', 'peers-and-trackers', 'all'],
+            defaultValue: 'peers'
+        },
+        'bt-dht-bootstrap-nodes': {
+            type: 'string',
+            defaultValue: 'dht.libtorrent.org:25401,dht.transmissionbt.com:6881,router.bittorrent.com:6881,router.utorrent.com:6881'
+        },
+        'bt-encryption': {
+            type: 'option',
+            options: ['preferred', 'required', 'disabled'],
+            defaultValue: 'preferred'
+        },
+        'bt-external-port': {
+            type: 'integer',
+            defaultValue: '0',
+            min: 0,
+            max: 65535
+        },
+        'bt-file-priority': {
+            type: 'string'
+        },
+        'bt-first-last-piece-first': {
+            type: 'boolean',
+            defaultValue: 'false'
+        },
+        'bt-interface': {
+            type: 'string'
+        },
+        'bt-max-connections': {
+            type: 'integer',
+            defaultValue: '500',
+            min: 2,
+            max: 65535
+        },
+        'bt-max-uploads': {
+            type: 'integer',
+            defaultValue: '20',
+            min: 1,
+            max: 65535
+        },
+        'bt-max-uploads-per-torrent': {
+            type: 'integer',
+            defaultValue: '4',
+            min: 1,
+            max: 65535
+        },
+        'bt-peer-blocklist': {
+            type: 'string'
+        },
+        'bt-peer-id-prefix': {
+            type: 'string',
+            defaultValue: '-qB5230-'
+        },
+        'bt-port-mapping': {
+            type: 'boolean',
+            defaultValue: 'true'
+        },
+        'bt-proxy': {
+            type: 'string'
+        },
+        'bt-rate-limit-overhead': {
+            type: 'boolean',
+            defaultValue: 'false'
+        },
+        'bt-super-seeding': {
+            type: 'boolean',
+            defaultValue: 'false'
+        },
+        'bt-transport': {
+            type: 'option',
+            options: ['tcp', 'utp', 'both'],
+            defaultValue: 'both'
+        },
+        'bt-user-agent': {
+            type: 'string',
+            defaultValue: 'qBittorrent/5.2.3'
+        },
+        'detach-share-only': {
+            type: 'boolean',
+            defaultValue: 'false'
+        },
+        'force-sequential': {
+            type: 'boolean',
+            defaultValue: 'false'
+        },
+        'select-file': {
+            type: 'string'
+        },
+        'ed2k-server': {
+            type: 'string'
+        },
+        'ed2k-server-list': {
+            type: 'string'
+        },
+        'ed2k-node-list': {
+            type: 'string'
+        },
+        'ed2k-listen-port': {
+            type: 'integer',
+            defaultValue: '4662',
+            min: 0,
+            max: 65535
+        },
+        'ed2k-udp-listen-port': {
+            type: 'integer',
+            defaultValue: '4672',
+            min: 0,
+            max: 65535
+        },
+        'ed2k-port-mapping': {
+            type: 'boolean',
+            defaultValue: 'true'
+        },
+        'ed2k-upload-slots': {
+            type: 'integer',
+            defaultValue: '3',
+            min: 1,
+            max: 1000
+        },
+        'ed2k-max-connections': {
+            type: 'integer',
+            defaultValue: '100',
+            min: 1,
+            max: 4096
+        },
+        'ed2k-preview-priority': {
+            type: 'boolean',
+            defaultValue: 'false'
+        },
+        'media': {
+            type: 'option',
+            options: ['auto', 'file', 'hls', 'dash', 'collection'],
+            defaultValue: 'auto'
+        },
+        'media-format': {
+            type: 'option',
+            options: ['mp4', 'mkv', 'vtt'],
+            defaultValue: 'mp4'
+        },
+        'media-video': {
+            type: 'string',
+            defaultValue: 'best'
+        },
+        'media-audio': {
+            type: 'string',
+            defaultValue: 'best'
+        },
+        'media-subtitles': {
+            type: 'string',
+            defaultValue: 'none'
+        },
+        'media-pause-after-probe': {
+            type: 'boolean',
+            defaultValue: 'false'
+        },
+        'media-record-time': {
+            type: 'integer',
+            suffix: 'Seconds',
+            defaultValue: '0',
+            min: 0,
+            max: 31536000
+        },
+        'media-start-time': {
+            type: 'integer',
+            suffix: 'Seconds',
+            defaultValue: '0',
+            min: 0,
+            max: 31536000
+        },
+        'media-end-time': {
+            type: 'integer',
+            suffix: 'Seconds',
+            defaultValue: '0',
+            min: 0,
+            max: 31536000
+        },
+        'media-input': {
+            type: 'string'
+        },
+        'media-request-contexts': {
+            type: 'string'
+        },
+        'auto-file-renaming-style': {
+            type: 'option',
+            options: ['dot', 'parentheses'],
+            defaultValue: 'dot'
+        },
+        'incomplete-suffix': {
+            type: 'string'
+        },
+        'index-out': {
+            type: 'text',
+            separator: '\n'
+        },
+        'filename-hint': {
+            type: 'string'
+        },
+        'filename-hint-source': {
+            type: 'option',
+            options: ['browser', 'title', 'suggested'],
+            defaultValue: 'suggested'
+        },
+        'state-dir': {
+            type: 'string'
+        },
+        'state-save-interval': {
+            type: 'integer',
+            suffix: 'Seconds',
+            defaultValue: '10',
+            min: 1,
+            max: 600
+        },
+        'stop-with-process': {
+            type: 'integer',
+            defaultValue: '0',
+            min: 0,
+            max: 32
+        },
+        'log-max-size': {
+            type: 'string',
+            suffix: 'Bytes',
+            defaultValue: '10M'
+        },
+        'log-max-files': {
+            type: 'integer',
+            defaultValue: '4',
+            min: 1,
+            max: 64
+        },
+        'on-download-start': {
+            type: 'string'
+        },
+        'on-download-pause': {
+            type: 'string'
+        },
+        'on-download-stop': {
+            type: 'string'
+        },
+        'on-download-complete': {
+            type: 'string'
+        },
+        'on-download-error': {
+            type: 'string'
+        },
+        'on-bt-download-complete': {
+            type: 'string'
         }
     }).constant('aria2GlobalAvailableOptions', {
         // Aria2 Setting Page Definition EXAMPLE:
@@ -486,17 +775,34 @@
         httpFtpSFtpOptions: [
             'all-proxy', 'all-proxy-user', 'all-proxy-passwd', 'connect-timeout', 'dry-run', 'lowest-speed-limit',
             'max-connection-per-server', 'max-file-not-found', 'max-tries', 'min-split-size', 'netrc-path',
-            'no-netrc', 'no-proxy', 'remote-time', 'retry-wait', 'split', 'timeout'
+            'no-netrc', 'no-proxy', 'remote-time', 'retry-wait', 'split', 'timeout', 'load-cookies',
+            'ca-certificate', 'certificate', 'private-key', 'dns-over-https', 'interface'
         ],
         httpOptions: [
             'check-certificate', 'http-accept-gzip', 'http-no-cache', 'http-user', 'http-passwd', 'http-proxy',
             'http-proxy-user', 'http-proxy-passwd', 'https-proxy', 'https-proxy-user', 'https-proxy-passwd',
             'referer', 'enable-http-keep-alive', 'header', 'save-cookies', 'user-agent'
         ],
+        sftpOptions: [
+            'sftp-user', 'sftp-passwd', 'ssh-host-key-sha256'
+        ],
         btOptions: [
             'bt-enable-lpd', 'bt-exclude-tracker', 'bt-external-ip', 'bt-max-peers', 'bt-seed-unverified',
             'bt-tracker', 'enable-dht', 'enable-peer-exchange', 'follow-torrent', 'listen-port',
-            'max-overall-upload-limit', 'max-upload-limit', 'seed-ratio', 'seed-time'
+            'max-overall-upload-limit', 'max-upload-limit', 'seed-ratio', 'seed-time', 'bt-anonymous-mode',
+            'bt-blocklist-scope', 'bt-dht-bootstrap-nodes', 'bt-encryption', 'bt-external-port',
+            'bt-first-last-piece-first', 'bt-interface', 'bt-max-connections', 'bt-max-uploads',
+            'bt-max-uploads-per-torrent', 'bt-peer-blocklist', 'bt-peer-id-prefix', 'bt-port-mapping', 'bt-proxy',
+            'bt-rate-limit-overhead', 'bt-super-seeding', 'bt-transport', 'bt-user-agent', 'detach-share-only',
+            'force-sequential'
+        ],
+        ed2kOptions: [
+            'ed2k-server', 'ed2k-server-list', 'ed2k-node-list', 'ed2k-listen-port', 'ed2k-udp-listen-port',
+            'ed2k-port-mapping', 'ed2k-upload-slots', 'ed2k-max-connections', 'ed2k-preview-priority'
+        ],
+        mediaOptions: [
+            'media', 'media-format', 'media-video', 'media-audio', 'media-subtitles', 'media-pause-after-probe',
+            'media-record-time'
         ],
         metalinkOptions: [
             'follow-metalink'
@@ -510,7 +816,10 @@
             'download-result', 'enable-color', 'file-allocation', 'force-save', 'save-not-found', 'hash-check-only',
             'keep-unfinished-download-result', 'max-download-result', 'min-tls-version', 'log-level',
             'show-console-readout', 'summary-interval', 'max-overall-download-limit', 'max-download-limit',
-            'no-conf', 'quiet', 'remove-control-file', 'save-session', 'save-session-interval', 'stop'
+            'no-conf', 'quiet', 'remove-control-file', 'save-session', 'save-session-interval', 'stop',
+            'auto-file-renaming-style', 'incomplete-suffix', 'log-max-files', 'log-max-size',
+            'on-bt-download-complete', 'on-download-complete', 'on-download-error', 'on-download-pause',
+            'on-download-start', 'on-download-stop', 'state-dir', 'state-save-interval', 'stop-with-process'
         ]
     }).constant('aria2QuickSettingsAvailableOptions', {
         globalSpeedLimitOptions: [
@@ -650,6 +959,196 @@
             {
                 key: 'force-save',
                 category: 'global'
+            },
+            {
+                key: 'load-cookies',
+                category: 'http',
+                canUpdate: 'new'
+            },
+            {
+                key: 'ca-certificate',
+                category: 'http',
+                canUpdate: 'new'
+            },
+            {
+                key: 'certificate',
+                category: 'http',
+                canUpdate: 'new'
+            },
+            {
+                key: 'private-key',
+                category: 'http',
+                canUpdate: 'new'
+            },
+            {
+                key: 'dns-over-https',
+                category: 'http',
+                canUpdate: 'new'
+            },
+            {
+                key: 'interface',
+                category: 'http',
+                canUpdate: 'new'
+            },
+            {
+                key: 'ssh-host-key-sha256',
+                category: 'http',
+                canUpdate: 'new'
+            },
+            {
+                key: 'bt-encryption',
+                category: 'bittorrent',
+                canUpdate: 'new'
+            },
+            {
+                key: 'bt-first-last-piece-first',
+                category: 'bittorrent',
+                canUpdate: 'new'
+            },
+            {
+                key: 'bt-max-uploads-per-torrent',
+                category: 'bittorrent',
+                canUpdate: 'new'
+            },
+            {
+                key: 'bt-super-seeding',
+                category: 'bittorrent',
+                canUpdate: 'new'
+            },
+            {
+                key: 'bt-transport',
+                category: 'bittorrent',
+                canUpdate: 'new'
+            },
+            {
+                key: 'detach-share-only',
+                category: 'bittorrent',
+                canUpdate: 'new'
+            },
+            {
+                key: 'force-sequential',
+                category: 'bittorrent',
+                canUpdate: 'new'
+            },
+            {
+                key: 'ed2k-server',
+                category: 'global',
+                canUpdate: 'new'
+            },
+            {
+                key: 'ed2k-server-list',
+                category: 'global',
+                canUpdate: 'new'
+            },
+            {
+                key: 'ed2k-node-list',
+                category: 'global',
+                canUpdate: 'new'
+            },
+            {
+                key: 'ed2k-preview-priority',
+                category: 'global',
+                canUpdate: 'new'
+            },
+            {
+                key: 'media',
+                category: 'global',
+                canUpdate: 'new'
+            },
+            {
+                key: 'media-format',
+                category: 'global',
+                canUpdate: 'new'
+            },
+            {
+                key: 'media-video',
+                category: 'global',
+                canUpdate: 'new'
+            },
+            {
+                key: 'media-audio',
+                category: 'global',
+                canUpdate: 'new'
+            },
+            {
+                key: 'media-subtitles',
+                category: 'global',
+                canUpdate: 'new'
+            },
+            {
+                key: 'media-pause-after-probe',
+                category: 'global',
+                canUpdate: 'new'
+            },
+            {
+                key: 'media-record-time',
+                category: 'global',
+                canUpdate: 'new'
+            },
+            {
+                key: 'media-start-time',
+                category: 'global',
+                canUpdate: 'new'
+            },
+            {
+                key: 'media-end-time',
+                category: 'global',
+                canUpdate: 'new'
+            },
+            {
+                key: 'auto-file-renaming-style',
+                category: 'global',
+                canUpdate: 'new'
+            },
+            {
+                key: 'incomplete-suffix',
+                category: 'global',
+                canUpdate: 'new'
+            },
+            {
+                key: 'index-out',
+                category: 'global',
+                canUpdate: 'new'
+            },
+            {
+                key: 'filename-hint',
+                category: 'http',
+                canUpdate: 'new'
+            },
+            {
+                key: 'filename-hint-source',
+                category: 'http',
+                canUpdate: 'new'
+            },
+            {
+                key: 'sftp-user',
+                category: 'http',
+                canUpdate: 'new'
+            },
+            {
+                key: 'sftp-passwd',
+                category: 'http',
+                canUpdate: 'new'
+            },
+            {
+                key: 'bt-file-priority',
+                category: 'bittorrent',
+                canUpdate: 'new|active|waiting|paused'
+            },
+            {
+                key: 'select-file',
+                category: 'bittorrent',
+                canUpdate: 'new|active|waiting|paused'
+            },
+            {
+                key: 'media-input',
+                category: 'global',
+                canUpdate: 'new'
+            },
+            {
+                key: 'media-request-contexts',
+                category: 'global',
+                canUpdate: 'new'
             }
         ]
     });

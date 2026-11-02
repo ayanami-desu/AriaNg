@@ -55,7 +55,19 @@
                 templateUrl: 'views/settings-aria2.html',
                 controller: 'Aria2SettingsController'
             })
+            .when('/settings/aria2/sftp', {
+                templateUrl: 'views/settings-aria2.html',
+                controller: 'Aria2SettingsController'
+            })
             .when('/settings/aria2/bt', {
+                templateUrl: 'views/settings-aria2.html',
+                controller: 'Aria2SettingsController'
+            })
+            .when('/settings/aria2/ed2k', {
+                templateUrl: 'views/settings-aria2.html',
+                controller: 'Aria2SettingsController'
+            })
+            .when('/settings/aria2/media', {
                 templateUrl: 'views/settings-aria2.html',
                 controller: 'Aria2SettingsController'
             })

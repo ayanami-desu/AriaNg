@@ -76,15 +76,7 @@ Currently available translations:
 
 | Tag | Language | Contributors |
 | --- | --- | --- |
-| cz-CZ | Čeština | [@vorm04](https://github.com/vorm04) |
-| de-DE | Deutsch | [@Malonsow](https://github.com/Malonsow) |
 | en | English | / |
-| es | Español | [@castillofrancodamian](https://github.com/castillofrancodamian) |
-| fr-FR | Français | [@Valaraukar86](https://github.com/Valaraukar86) |
-| it-IT | Italiano | [@ale-saglia](https://github.com/ale-saglia) |
-| ja-JP | 日本語 | [@massangoDa](https://github.com/massangoDa) |
-| pl-PL | Polski | [@Pirania3680](https://github.com/Pirania3680) |
-| ru-RU | Русский | [@gazizovemil](https://github.com/gazizovemil) |
 | zh-Hans | 简体中文 | / |
 | zh-Hant | 繁體中文 | [@zhtw2013](https://github.com/zhtw2013) [@ChiaYen-Kan](https://github.com/ChiaYen-Kan) |
 
