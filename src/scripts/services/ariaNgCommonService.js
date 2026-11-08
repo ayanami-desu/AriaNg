@@ -164,6 +164,8 @@
                         result.push(line);
                     } else if (line.match(/^magnet:\?.+$/)) {
                         result.push(line);
+                    } else if (trimmedLine.match(/^ed2k:\/\/\|file\|.+$/i)) {
+                        result.push(trimmedLine);
                     } else if (trimmedLine.match(/^[a-f0-9]{40}$/i)) {
                         result.push('magnet:?xt=urn:btih:' + trimmedLine);
                     }
